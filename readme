@@ -1,0 +1,16 @@
+
+**run this in powershell to get new access token**
+
+$checksum = (Get-FileHash -InputStream ([System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes("b23k98eqicyh4s3p" + "NEW_REQUEST_TOKEN" + "x87nlb1zo9y78cn85nmdziacxal1mtbn"))) -Algorithm SHA256).Hash.ToLower()
+$response = Invoke-RestMethod -Method POST -Uri "https://api.kite.trade/session/token" -Body @{
+    api_key       = "b23k98eqicyh4s3p"
+    request_token = "NEW_REQUEST_TOKEN"
+    checksum      = $checksum
+}
+
+Write-Host "Access Token:" $response.data.access_token
+
+
+**run the program**
+
+Get-Content .env | Where-Object { $_ -match '^\s*[^#\s]' } | ForEach-Object { $parts = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($parts[0].Trim(), ($parts[1].Trim() -replace '\s*#.*$', ''), 'Process') }; $env:PATH = "C:\msys64\mingw64\bin;$env:PATH"; go run ./cmd/engine
